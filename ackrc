@@ -1,6 +1,0 @@
---type-add=cpp=.ipp,.tpp,.ini,.cfg,.conf
---type-set=jam=.jam
---type-set=book=.qbk
---type-add=ruby=.haml,.rake,.feature,.sass,.scss
---type-set=cmake=.cmake,CMakeLists.txt
-#--type-add-extended=jam=Jamfile
