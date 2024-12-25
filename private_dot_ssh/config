@@ -1,0 +1,38 @@
+#Cipher aes256-ctr
+Compression yes
+ControlMaster auto
+#ControlPath /tmp/ssh-%r@%h:%p
+DSAAuthentication yes
+ForwardAgent yes
+#ForwardX11 yes
+#ForwardX17Trusted yes
+GatewayPorts yes
+LogLevel ERROR
+PreferredAuthentications publickey,keyboard-interactive,password
+ServerAliveInterval 600
+
+Host diskstation
+  HostName 192.168.0.2
+  Port 2202
+  User nsmith
+
+Host udmp
+  HostName 192.168.0.1
+  User root
+
+Host mc
+  HostName  150.230.174.66
+  User opc
+
+Host arcade
+  HostName 192.168.0.42
+  User root
+
+Host work
+  HostName 192.168.0.108
+  User nathansmith
+
+Host games
+  HostName 192.168.0.61
+  User nsmith
+  Port 2222

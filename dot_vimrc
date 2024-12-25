@@ -1,0 +1,364 @@
+" Help hints
+" jj <ESC>
+" ,a :Ack
+" ,w vsplit and switch buffers
+" ,c* comment visual block
+" ,cv git diff
+" fugitive - :Gedit, :Gsplit, :Gvsplit, :Gstatus, :Gcommit
+
+set nocompatible
+autocmd!
+filetype off
+filetype plugin indent on
+syntax on
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Set up some basic variables
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" General Settings {{{
+
+" Tabs/spaces
+set ts=3
+set sw=3
+set et
+set cino=g0,t0,+2,(2,u2,)
+set smartindent
+
+" Basic options
+set backspace=indent,eol,start " backspacing over everything in insert mode
+set autoindent                 " always set autoindenting on
+set copyindent                 " copy the previous indetation on autoindenting
+set nobackup                   " do not keep a backup file, use versions instead
+set history=50                 " keep 50 lines of command line history
+set ruler                      " show the cursor position all the time
+set showcmd                    " display incomplete commands
+set laststatus=2               " Always display the status line
+set foldmethod=marker          " Sets the folding method to fold on {{{ }}}
+set hidden                     " edit file without losing modifications to current file
+set autowrite                  " auto-save a modified buffer when switching
+set vb t_vb=                   " disable any beeps or flashes on error
+set formatoptions+=cron        " Allows for lists in vim
+set noequalalways              " prevent's VIM from changing window sizing for taglist
+set restorescreen               " Restore screen at exit
+"set wildmenu                   " Allows filesystem surfing
+"set wildmode=longest,list      " Bash like tab completion
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*.so,*.o,*_ut-d,*_ut-d-z,*_ut-z,*_ut.output,*_ut.test
+set pastetoggle=<F2>           " Switch to paste mode when pasting to prevent autoindenting
+set grepprg=rg\ $* " How to search
+
+                               " Searching
+set ignorecase                 " Ignore case
+set smartcase                  " Use intelligen case
+set incsearch                  " do incremental searching
+set showmatch                  " Jump to the matching brace
+set hlsearch                   " highlight search
+set gdefault                   " g is a default option for search/replace
+
+set printoptions=paper:letter
+" }}}
+
+let mapleader=","
+set makeprg=gulp\ karma
+
+" When vimrc is edited, reload it
+autocmd! bufwritepost vimrc source ~/.vimrc
+
+" Customize Status line color
+"highlight StatusLine guifg=SlateBlue guibg=Yellow
+"highlight StatusLineNC guifg=Gray guibg=White
+"set statusline=%t
+"set statusline=%t\ %{fugitive#statusline()}\ %h%m%r%=%c,%l/%L\ %P
+"set statusline=%{fugitive#statusline()}\  " Buffer
+"set statusline+=%<%.99f\  " relative path to file
+"set statusline+=%h "
+"set statusline+=%w "
+"set statusline+=%m " modified flag
+"set statusline+=%r " read-only flag
+"set statusline+=%y " filetype
+"set statusline+=%=%-16(\ %l/%L,%c\ %)%P
+set t_Co=256 " Explicity tell vim that the terminal as 256 colors
+
+set autoindent
+set undodir=$HOME/.vim/undodir
+set undofile
+set undolevels=1000 " maximum number of changes that can be undone
+set undoreload=10000 " maximum number of lines to save for undo on a buffer reload
+set number
+
+set cscopeprg="ctags -R ."
+" Ignore filename with any of these suffixes
+set suffixes=.aux,.bak,.dvi,.gz,.idx,.log,.ps,.swp,.tar
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Set up mappings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+map Q gq            " Don't use Ex mode, use Q for formatting
+map :W :wall
+map <C-J> <C-W>w
+map <C-K> <C-W>W
+nmap <leader>w :w!<cr>
+nmap :Q :q
+nmap :Wq :wq
+
+"map <leader>tidy :%! tidy -config $HOME/.vim/ftplugin/tidyrc<CR>
+
+" Set up visual mode mappings {{{
+
+" Comment selected text by putting it into register, inserting /* recalling " register */
+vmap ,c* "zdi/*<C-R>z*/<ESC>
+
+" remap the semicolon to act like the colon
+nnoremap ; :
+
+" Quickly edit/reload the vimrc file
+nmap <silent> <leader>ev :e $MYVIMRC<CR>
+"nmap <silent> <leader>sv :so $MYVIMRC<CR>
+
+" Use Q for formatting the current paragraph (or selection)
+vmap Q gq
+nmap Q gqap
+
+" Jumps to the next line even if it's a word wrapped line
+nnoremap j gj
+nnoremap k gk
+
+" When you’re in visual mode D will duplicate whatever’s selected directly below.
+vmap D y'>p
+
+" Remap jj to be ESC in insert mode
+inoremap jj <ESC>
+
+nmap <leader>b :make<cr>
+
+" Open definition in a vertical split
+map <C-\> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+
+" Easy buffer navigation
+map <C-h> <C-w>h
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
+map <leader>v <C-w>v<C-w>l
+
+" }}}
+
+" Plugins {{{
+" git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+call plug#begin()
+
+Plug 'tpope/vim-surround'
+"Bundle 'zxqfl/tabnine-vim'
+"Bundle 'codota/tabnine-vim'
+let g:plug_url_format = 'git@github.com:%s.git'
+
+Plug 'github/copilot.vim.git'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+let g:coc_global_extensions = ['coc-tsserver', 'coc-json', 'coc-html', 'coc-css']
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+if has("patch-8.1.1564")
+  " Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
+
+nmap <leader>gd <Plug>(coc-definition)
+nmap <leader>gr <Plug>(coc-reference)
+nnoremap <C-p> :Files<CR>
+inoremap <silent><expr> <c-space> coc#refresh()
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <expr> <C-j> pumvisible() ? '<C-n>' : ''
+inoremap <expr> <C-k> pumvisible() ? '<C-p>' : ''
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+"Plug 'dense-analysis/ale'
+"let g:ale_linters = {
+      "\   'typescript': ['tsserver', 'tsx']
+      "\}
+"let g:ale_fixers = {
+      "\    'typescript': ['prettier'],
+      "\}
+let g:ale_fix_on_save = 1
+
+Plug 'vim-scripts/Align'
+Plug 'gregsexton/MatchTag'
+
+" github repos
+Plug 'vim-scripts/gitignore'
+"Plug "leafgarland/typescript-vim"
+"Plug "ianks/vim-tsx"
+"Plug "pangloss/vim-javascript"
+"Plug "martinda/Jenkinsfile-vim-syntax"
+"Plug "modille/groovy.vim"
+
+Plug 'sheerun/vim-polyglot'
+
+" Improved commenting
+Plug 'scrooloose/nerdcommenter'
+" Improved tab completion
+"Plug 'ervandew/supertab'
+
+autocmd FileType cpp set mps+=<:>
+
+Plug 'vim-scripts/vcscommand.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-unimpaired'
+
+Plug 'joshdick/onedark.vim'
+Plug 'altercation/vim-colors-solarized'
+Plug 'neoclide/jsonc.vim'
+call plug#end()
+" }}}
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+
+  " Remove trailing whitespace on opening of a new file
+  "autocmd BufWritePre * :%s/\s\+$//e
+  "autocmd FileType c,*pp,java,php,rb autocmd BufWritePre <buffer> :call setline(1,map(getline(1,"$"),'substitute(v:val,"\\s\\+$","","")'))
+  autocmd FileType javascript,c,cpp,hpp,python,ruby,java,sh autocmd BufWritePre <buffer> :%s/\s\+$//e
+
+
+  " This will run java.vim plugin only if it's a java file
+  au BufNewFile,BufRead *.cop source ${HOME}/.vim/ftplugin/cop.vim
+  au BufNewFile,BufRead *.[hci]pp set syntax=cpp11
+
+  autocmd BufNewFile,BufRead *.dml set syntax=abinitio
+  autocmd BufRead,BufNewFile tsconfig.json set filetype=jsonc
+
+  "au FileType json setlocal equalprg=python\ -m\ json.tool
+
+
+
+  " Make sure we use tabs with Makefiles
+  " au BufEnter *akefile* set noet
+  " au BufEnter *akefile* set noautoindent
+  au BufEnter makeinclude.macros set ft=make
+  au BufEnter *akefile* set ft=make
+  au FileType make set noet
+  au FileType make set noai
+
+  " For all text files set 'textwidth' to 8 characters.
+  autocmd FileType text setlocal textwidth=78
+  autocmd FileType tex setlocal textwidth=78
+  autocmd FileType mail setlocal spell spelllang=en_us
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid or when inside an event handler
+  " (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \   exe "normal g`\"zz" |
+    \ endif
+
+  " Mutt settings
+  "au FileType mail set ai et list tw=72
+  "au FileType mail set listchars=tab:>>,trail:.
+  "au FileType mail set comments=fb:*,fb:-,nb:>
+  "au FileType mail set fo=cqrtn
+  "au FileType mail set nosmartindent
+
+
+endif " has("autocmd")
+
+"
+" This allows for tab completion of variables
+"
+"function! InsertTabWrapper(direction)
+  "let col = col('.') - 1
+  "if !col || getline('.')[col - 1] !~ '\k'
+    "return "\<tab>"
+  "elseif "backward" == a:direction
+    "return "\<c-p>"
+  "else
+    "return "\<c-n>"
+  "endif
+"endfunction
+
+"function! Smart_TabComplete()
+  "let line = getline('.')                         " current line
+
+  "let substr = strpart(line, -1, col('.')+1)      " from the start of the current
+                                                  "" line to one character right
+                                                  "" of the cursor
+  "let substr = matchstr(substr, "[^ \t]*$")       " word till cursor
+  "if (strlen(substr)==0)                          " nothing to match on empty string
+    "return "\<tab>"
+  "endif
+  "let has_period = match(substr, '\.') != -1      " position of period, if any
+  "let has_slash = match(substr, '\/') != -1       " position of slash, if any
+  "if (!has_period && !has_slash)
+    "return "\<C-X>\<C-P>"                         " existing text matching
+  "elseif ( has_slash )
+    "return "\<C-X>\<C-F>"                         " file matching
+  "else
+    "return "\<C-X>\<C-O>"                         " plugin matching
+  "endif
+"endfunction
+
+"inoremap <tab> <c-r>=Smart_TabComplete()<CR>
+"inoremap <tab> <c-r>=InsertTabWrapper ("forward")<cr>
+"inoremap <s-tab> <c-r>=InsertTabWrapper ("backward")<cr>
+"let g:snips_trigger_key="<tab>"
+
+" Include this in your ~/.vimrc file and invoke it with ":call
+" FoldProperties()" when viewing the output of "svn diff" to hide the
+" property-change noise:
+function FoldProperties()
+  set nows
+  :1
+  while 1
+    try
+      /^Property/
+      mark a
+      try
+        /^Index:/-1
+      catch
+        :$
+      endt
+      mark b
+      :'a,'bfo
+    catch
+      break
+    endt
+  endw
+  :1
+  set ws
+endf
+
+"
+" Color setup
+"
+" highlight Normal guibg=Black guifg=White
+"highlight Comment ctermfg=red
+" highlight ExtraWhitespace ctermbg=red guibg=red
+" autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+" autocmd BufWinEnter * match ExtraWhitespace /\s\+$\| \+\ze\t/
+" colorscheme desert
+let g:solarized_termcolors=256
+set background=dark
+colorscheme solarized
+colorscheme desert
+
+highlight Pmenu    guifg=#ffffff guibg=#202020 ctermfg=255 ctermbg=238
+highlight PmenuSel    guifg=#000000 guibg=#b1d631 ctermfg=0 ctermbg=148
+
+
+if &diff
+  colorscheme blue
+endif
