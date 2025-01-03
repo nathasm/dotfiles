@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -d "$HOME/.config/lunarvim" ]; then
+if [ ! -d "$HOME/.local/share/lunarvim" ]; then
    echo "Getting LunarVim"
    bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/master/utils/installer/install.sh)
 else
