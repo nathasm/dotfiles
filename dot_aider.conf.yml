@@ -1,0 +1,6 @@
+dark-mode: true
+gitignore: false
+auto-commits: false
+attribute-author: false
+attribute-committer: false
+attribute-commit-message-author: false
